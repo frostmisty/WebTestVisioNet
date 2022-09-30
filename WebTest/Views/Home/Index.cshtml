@@ -1,0 +1,68 @@
+﻿@using WebTest.ViewModels
+@model IEnumerable<TrKasirViewModel>
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <div class="row col-md-12">
+        <div class="col-md-6" style="text-align:right">
+            <a class="btn btn-sm btn-primary" title="Create New" asp-controller="Home" asp-action="AddOrUpdate">New Entry</a>
+        </div>
+    </div>
+    <table id="trkasir" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Code</th>
+                <th>PointReward</th>
+                <th>Diskon</th>
+                <th>Total Belanja</th>
+                <th>TotalBayar</th>
+                <th>Time Created</th>
+                <th>Action</th>
+             </tr>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Code</td>
+                    <td>@item.PointReward</td>
+                    <td>@item.Diskon</td>
+                    <td>@item.TotalBelanja</td>
+                    <td>@item.TotalBayar</td>
+                    <td>@item.TsCrt</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" title="Edit" asp-controller="Home" asp-action="AddOrUpdate" asp-route-Id="@item.Id">Edit</a>
+                        <span>&emsp;</span>
+                        <a class="btn btn-sm btn-danger" title="Delete" asp-controller="Home" asp-action="Delete" asp-route-Id="@item.Id">Delete</a>
+                     </td>
+                </tr>
+                }
+        }
+        </tbody>
+        </table>
+</div>
+<script type="text/javascript">
+    
+    var tipe = $('#')
+    //$("#trkasir").DataTable({
+    //"responsive": true, "lengthChange": false, "autoWidth": false,
+    //"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+    //}).buttons().container().appendTo('#mspagedt_wrapper .col-md-6:eq(0)');
+
+    $(".delete").click(function(event){
+    if(confirm("Are you sure you want to Delete?"))
+    {
+    }else{
+    event.preventDefault();
+    }
+    })
+</script>

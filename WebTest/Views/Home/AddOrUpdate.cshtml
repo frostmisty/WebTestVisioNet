@@ -1,0 +1,126 @@
+﻿@using WebTest.ViewModels
+@model TrKasirViewModel
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">Transaksi Kasir</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <form class="form-horizontal" method="post">
+                        <div class="card-body">
+                            @Html.HiddenFor(x=>x.Id)
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.Code, "Code", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.Code, new { @class = "form-control", @placeholder = "Code",@readonly="readonly" })
+                                </div>
+                            </div>
+                             
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.PointReward, "Point Reward", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.PointReward, new { @class = "form-control", @type = "number", @placeholder = "PointReward" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.TotalBelanja, "Total Belanja", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.TotalBelanja, new { @class = "form-control", @type = "number", @placeholder = "Tota Belanja" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.TipeCostumer, "Type Costumer", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    <select asp-for="@Model.TipeCostumer" asp-items="@Model.GetJenis" class="form-control select2-blue"></select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.Diskon, "Diskon ", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.Diskon, new { @class = "form-control", @type = "number", @placeholder = "Diskon",@readonly="readonly" })
+                                </div>
+                            </div>
+
+                            
+                            <div class="form-group row">
+                                @Html.LabelFor(x => x.TotalBayar, "Total Bayar", new { @class = "col-sm-2 col-form-label" })
+                                <div class="col-sm-10">
+                                    @Html.TextBoxFor(x => x.TotalBayar, new { @class = "form-control", @type = "number", @placeholder = "TotalBayar",@readonly="readonly" })
+                                </div>
+                            </div>
+                            <div style="text-align:center">
+                                <button type="submit" title="Cancel" class="btn btn-outline-warning btn-sm" asp-controller="Home" asp-action="Index">Cancel</button>
+                                @*<input type="button" class="btn btn-sm btn-warning" name="action"value="Save" />*@
+                                <button type="submit" title="Save" class="btn btn-outline-primary btn-sm" asp-controller="Home" asp-action="Update" asp-route-Home="@Model">Save</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+    $("#TipeCostumer").change(function(){
+        var nilai = $(this).val();
+        var tipecostumer = $(this).find("option:selected").text();
+        var reward = $("#PointReward").val();
+        
+        var persentase=0;
+        var adddiskon=0;
+            if(tipecostumer == "Silver")
+            {
+                if(reward >= 100 && reward <= 300){ adddiskon = 12}
+                else if(reward >= 301 && reward <= 500){ adddiskon = 27}
+                else if(reward >= 501){ adddiskon = 39}
+                persentase = 0.1;
+            }
+            else if(tipecostumer == "Gold")
+            {
+                if(reward >= 100 && reward <= 300){ adddiskon = 25}
+                else if(reward >= 301 && reward <= 500){ adddiskon = 34}
+                else if(reward >= 501){ adddiskon = 52}
+                persentase = 0.4;
+            }
+            else if(tipecostumer == "Platinum")
+            {
+                if(reward >= 100 && reward <= 300){ adddiskon = 35}
+                else if(reward >= 301 && reward <= 500){ adddiskon = 50}
+                else if(reward >= 501){ adddiskon = 68}
+                persentase = 0.5;
+            }else{ diskon = 0 }
+            hitung(persentase,adddiskon);
+        
+    })
+    function hitung(persentase,adddiskon)
+    {
+        var totalbelanja = $("#TotalBelanja").val();
+        var diskon = 0;
+        var totbayar = 0;
+        diskon = totalbelanja * persentase + adddiskon;
+        totbayar = totalbelanja - diskon;
+        $("#Diskon").val(diskon);
+        $("#TotalBayar").val(totbayar);
+    }
+    </script>
+    
+}
