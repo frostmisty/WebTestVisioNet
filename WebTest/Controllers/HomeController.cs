@@ -20,13 +20,13 @@ namespace WebTest.Controllers
             _context = context;
         }
 
-        public async Task<ActionResult<IEnumerable<TrKasirViewModel>>> Index()
+        public async Task<ActionResult<IEnumerable<HomeViewModel>>> Index()
         {
-            List<TrKasirViewModel> viewModel = new List<TrKasirViewModel>();
+            List<HomeViewModel> viewModel = new List<HomeViewModel>();
             var data = await  _context.TrKasir.ToListAsync();
             if(data.Count > 0)
             {
-                viewModel = data.Select(x => new TrKasirViewModel()
+                viewModel = data.Select(x => new HomeViewModel()
                 {
                     Id = x.Id,
                     Code = x.Code,
@@ -34,16 +34,17 @@ namespace WebTest.Controllers
                     PointReward = x.PointReward,
                     Diskon = x.Diskon,
                     TotalBayar = x.TotalBayar,
-                    TotalBelanja = x.TotalBelanja
+                    TotalBelanja = x.TotalBelanja,
+                    TsCrt = x.TsCrt
                 }).OrderBy(x => x.Id).ToList();
             }
             return View(viewModel);
         }
 
-        public async Task<ActionResult<TrKasirViewModel>> AddOrUpdate(int Id=0)
+        public async Task<ActionResult<HomeViewModel>> AddOrUpdate(int Id=0)
         {
             var data = _context.TrKasir.Where(x => x.Id.Equals(Id)).FirstOrDefault();
-            TrKasirViewModel viewModel = new TrKasirViewModel();
+            HomeViewModel viewModel = new HomeViewModel();
             if(data != null)
             {
                 viewModel.Id = data.Id;
@@ -60,37 +61,76 @@ namespace WebTest.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(TrKasirViewModel viewModel)
+        public async Task<IActionResult> AddOrUpdate(IFormCollection formCollection)
         {
-            var data = _context.TrKasir.Where(x => x.Id.Equals(viewModel.Id)).FirstOrDefault();
+            HomeViewModel ViewModel = new HomeViewModel();
+            ViewModel.Id = int.Parse(formCollection["Id"]);
+            ViewModel.Code = formCollection["Code"];
+            ViewModel.TipeCostumer = formCollection["TipeCostumer"];
+            ViewModel.PointReward = int.Parse(formCollection["PointReward"]);
+            ViewModel.TotalBelanja = int.Parse(formCollection["TotalBelanja"]);
+            ViewModel.Diskon = int.Parse(formCollection["Diskon"]);
+            ViewModel.TotalBayar = int.Parse(formCollection["TotalBayar"]);
+
+
+            var data = _context.TrKasir.Where(x => x.Id.Equals(ViewModel.Id)).FirstOrDefault();
             string code="";
             if(data == null)
             {
                 data = new TrKasir();
-                viewModel.Code = generateCode();
+                ViewModel.Code = generateCode();
             }
-            data.Id = viewModel.Id;
-            data.Code = viewModel.Code;
-            data.TipeCostumer = viewModel.TipeCostumer;
-            data.PointReward = viewModel.PointReward;
-            data.Diskon = viewModel.Diskon;
-            data.TotalBayar = viewModel.TotalBayar;
-
-            //data.Code = viewModel.Code;
-            //data.TipeCostumer = viewModel.TipeCostumer;
-            //data.PointReward = viewModel.PointReward;
-            //data.Diskon = viewModel.Diskon;
-            //data.TotalBayar = viewModel.TotalBayar;
-            data.TsCrt = DateTime.Now;
-            if(data == null)
+            else
             {
-                await _context.TrKasir.AddAsync(data);
-            }else{
-                _context.TrKasir.Update(data);
-                await _context.SaveChangesAsync();
+                data.Id = ViewModel.Id;
+            }
+
+            data.Code = ViewModel.Code;
+            data.TipeCostumer = ViewModel.TipeCostumer;
+            data.PointReward = ViewModel.PointReward;
+            data.TotalBelanja = ViewModel.TotalBelanja;
+            data.Diskon = ViewModel.Diskon;
+            data.TotalBayar = ViewModel.TotalBayar;
+            data.TsCrt = DateTime.Now;
+            try
+            {
+                if (ViewModel.Id == 0)
+                {
+                    _context.TrKasir.AddAsync(data);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    _context.TrKasir.Update(data);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch(Exception ex)
+            {
+                Error();
             }
             
-            return View(viewModel);
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int Id)
+        {
+            var data = await _context.TrKasir.Where(x => x.Id.Equals(Id)).FirstOrDefaultAsync();
+            try
+            {
+                if (data != null)
+                {
+                    _context.TrKasir.Remove(data);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch(Exception ex)
+            {
+                Error();
+            }
+            
+            return RedirectToAction("Index");
         }
 
         public string generateCode()
@@ -102,7 +142,8 @@ namespace WebTest.Controllers
             .OrderByDescending(x => x.TsCrt).FirstOrDefault();
             if(check != null)
             {
-                var lastno = Convert.ToInt32(check.Code.Substring(check.Code.Length-9,5))+1;
+                var s = check.Code.Substring(check.Code.Length - 5, 5);
+                var lastno = Convert.ToInt32(check.Code.Substring(check.Code.Length-5,5))+1;
                 newno = string.Format("{0:00000}",lastno);
                 data = date+"_"+newno;
             }

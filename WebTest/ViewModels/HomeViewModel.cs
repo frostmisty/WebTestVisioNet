@@ -7,7 +7,7 @@ using WebTest.Entity;
 
 namespace WebTest.ViewModels
 {
-    public class TrKasirViewModel
+    public class HomeViewModel
     {
         public int Id;
         public string? Code;

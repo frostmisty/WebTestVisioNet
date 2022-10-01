@@ -1,5 +1,5 @@
 ﻿@using WebTest.ViewModels
-@model TrKasirViewModel
+@model HomeViewModel
 
 @{
     ViewData["Title"] = "View";
@@ -63,8 +63,8 @@
                             </div>
                             <div style="text-align:center">
                                 <button type="submit" title="Cancel" class="btn btn-outline-warning btn-sm" asp-controller="Home" asp-action="Index">Cancel</button>
-                                @*<input type="button" class="btn btn-sm btn-warning" name="action"value="Save" />*@
-                                <button type="submit" title="Save" class="btn btn-outline-primary btn-sm" asp-controller="Home" asp-action="Update" asp-route-Home="@Model">Save</button>
+                                <button type="submit" class="btn btn-sm btn-warning" name="action" id="btnSave">Save</button>
+                                @*<button type="submit" title="Save" class="btn btn-outline-primary btn-sm" asp-controller="Home" asp-action="AddOrUpdate" asp-route-Home="@Model">Save</button>*@
                             </div>
                         </div>
                     </form>
@@ -81,6 +81,7 @@
 @section Scripts {
     <script type="text/javascript">
     $("#TipeCostumer").change(function(){
+        debugger
         var nilai = $(this).val();
         var tipecostumer = $(this).find("option:selected").text();
         var reward = $("#PointReward").val();
@@ -111,8 +112,7 @@
             hitung(persentase,adddiskon);
         
     })
-    function hitung(persentase,adddiskon)
-    {
+    function hitung(persentase, adddiskon) {
         var totalbelanja = $("#TotalBelanja").val();
         var diskon = 0;
         var totbayar = 0;
@@ -120,7 +120,58 @@
         totbayar = totalbelanja - diskon;
         $("#Diskon").val(diskon);
         $("#TotalBayar").val(totbayar);
+
     }
+    $('#btnSave').click(function() {
+        save();
+    });
+    function save()
+    {
+        debugger;
+        var Id = $("#Id").val();
+        var Code = $("#Code").val();
+        var Tipe = $("#TipeCostumer").val();
+        var Point = $("#PointReward").val();
+        var TotBelanja = $("#TotalBelanja").val();
+        var Diskon = $("#Diskon").val();
+        var TotBayar = $("#TotalBayar").val();
+
+        var formData = new FormData();
+        formData.append("Id", Id);
+        formData.append("Code", Code);
+        formData.append("Tipe", Tipe);
+        formData.append("Point", Point);
+        formData.append("TotBelanja", TotBelanja);
+        formData.append("Diskon", Diskon);
+        formData.append("TotBayar", TotBayar);
+        $.ajax({
+            type : 'POST',
+            url : '@Url.Action("AddOrUpdate","Home")',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: false,
+
+            success: successCallback,
+            error: errorCallback
+        });
+    }
+    
+    function errorCallback() {
+        bootbox.alert("Something went wrong please contact admin.");
+    }
+    function successCallback(response) {
+        if (response.responseCode == 0) {
+        //resetForm();
+            bootbox.alert(response.responseMessage, function() {
+
+        //PERFORM REMAINING LOGIC
+            });
+        }
+        else {
+            bootbox.alert(response.ResponseMessage);
+        }
+    };
     </script>
     
 }
