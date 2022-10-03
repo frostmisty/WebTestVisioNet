@@ -113,7 +113,7 @@ namespace WebTest.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost]
+        
         public async Task<IActionResult> Delete(int Id)
         {
             var data = await _context.TrKasir.Where(x => x.Id.Equals(Id)).FirstOrDefaultAsync();
@@ -142,7 +142,7 @@ namespace WebTest.Controllers
             .OrderByDescending(x => x.TsCrt).FirstOrDefault();
             if(check != null)
             {
-                var s = check.Code.Substring(check.Code.Length - 5, 5);
+                //var s = check.Code.Substring(check.Code.Length - 5, 5);
                 var lastno = Convert.ToInt32(check.Code.Substring(check.Code.Length-5,5))+1;
                 newno = string.Format("{0:00000}",lastno);
                 data = date+"_"+newno;
